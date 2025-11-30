@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import pandas as pd
 import io
+import plotly.express as px
 
 # --- 1. CONFIGURACIÓN DE PÁGINA (UX: Branding) ---
 st.set_page_config(
@@ -25,6 +26,13 @@ st.markdown("""
         padding: 15px;
         border-radius: 10px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        color: #2c3e50 !important;
+    }
+    .stMetric label {
+        color: #2c3e50 !important;
+    }
+    .stMetric div[data-testid="stMetricValue"] {
+        color: #2c3e50 !important;
     }
     h1 {
         color: #2c3e50;
@@ -74,19 +82,19 @@ def main():
     with st.sidebar:
         st.image("https://cdn-icons-png.flaticon.com/512/3029/3029337.png", width=80)
         st.title("StockVision AI")
-        st.info("Herramienta de auditoría de Share of Shelf automatizada.")
-        
+        st.markdown("**Herramienta de auditoría de Share of Shelf automatizada.**")
+
         st.divider()
         st.header("⚙️ Configuración")
-        conf = st.slider("Sensibilidad IA", 0.1, 0.9, 0.25, help="Sube este valor si detecta cosas que no son botellas.")
-        
+        conf = st.slider("Sensibilidad IA", 0.1, 0.9, 0.25, help="Valores más altos detectan menos objetos pero con mayor precisión.")
+
         st.divider()
         st.markdown("### 📝 Instrucciones")
         st.markdown("""
-        1. Sube una foto de la góndola.
-        2. El sistema detectará botellas.
-        3. Clasificará por color (Rojo/Azul).
-        4. Revisa el reporte final.
+        1. 📤 Sube una foto de la góndola.
+        2. 🔍 El sistema detectará botellas.
+        3. 🎨 Clasificará por color (Rojo/Azul).
+        4. 📊 Revisa el reporte final.
         """)
 
     # --- CABECERA PRINCIPAL ---
@@ -110,7 +118,7 @@ def main():
         tab1, tab2, tab3 = st.tabs(["🖼️ Análisis Visual", "📊 Reporte de Datos", "📥 Exportar"])
 
         with tab1:
-            if st.button("🔍 Ejecutar Análisis", type="primary", use_container_width=True):
+            if st.button("🔍 Ejecutar Análisis", type="secondary", use_container_width=True):
                 with st.spinner("🤖 La IA está auditando la góndola..."):
                     # Detección
                     results = model(image_pil, conf=conf, classes=[39])
@@ -133,8 +141,8 @@ def main():
                             bottle_crop = img_array[y1:y2, x1:x2]
                             brand_name, color_rgb = detect_brand_color(bottle_crop)
                             
-                            # Dibujar (Más grueso para visibilidad)
-                            cv2.rectangle(img_final, (x1, y1), (x2, y2), color_rgb, 3)
+                            # Dibujar (Líneas más finas para mejor legibilidad)
+                            cv2.rectangle(img_final, (x1, y1), (x2, y2), color_rgb, 2)
                             
                             # Fondo para el texto (Legibilidad)
                             cv2.rectangle(img_final, (x1, y1-25), (x2, y1), color_rgb, -1)
@@ -185,8 +193,20 @@ def main():
                 
                 with c_chart:
                     st.subheader("Participación de Mercado (Visual)")
-                    # Bar chart con colores personalizados según la marca (Lógica simple de colores)
-                    st.bar_chart(df_res.set_index("Marca")["Share (%)"], color="#FF4B4B")
+                    # Gráfico de barras con colores según la marca
+                    fig = px.bar(
+                        df_res,
+                        x="Marca",
+                        y="Share (%)",
+                        color="Marca",
+                        color_discrete_map={
+                            "Familia Coca-Cola": "#FF6B6B",  # Rojo suave
+                            "Familia PepsiCo": "#4ECDC4",    # Azul verdoso
+                            "Otros / Genérico": "#95A5A6"    # Gris suave
+                        }
+                    )
+                    fig.update_layout(showlegend=False)  # Ocultar leyenda para simplicidad
+                    st.plotly_chart(fig, use_container_width=True)
                 
                 with c_table:
                     st.subheader("Detalle")
