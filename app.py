@@ -237,9 +237,12 @@ def main():
                 st.info("Primero debes analizar una imagen.")
 
     else:
-        # UX: Estado vacío (Empty State) atractivo
+        # Estado vacío limpio
         st.info("👆 Sube una foto para comenzar la auditoría.")
-        st.image("https://ultralytics.com/images/yolov8-banner.jpg", caption="Powered by YOLOv8 + OpenCV", width='stretch')
+        # Quitamos la imagen que daba error y ponemos un texto simple
+        st.markdown("---")
+        st.markdown("Desarrollado con **YOLOv8** + **OpenCV**")
+        st.markdown("**Desarrollado por Daiana Elizabeth Gomez**")
 
 if __name__ == "__main__":
     main()
