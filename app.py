@@ -121,10 +121,20 @@ def main():
         st.image("https://cdn-icons-png.flaticon.com/512/3029/3029337.png", width=70)
         st.title("StockVision AI")
         st.caption("Auditoría Inteligente v1.0")
+        
         st.divider()
         st.subheader("⚙️ Configuración")
         conf = st.slider("Sensibilidad IA", 0.1, 0.9, 0.25)
-        st.info("💡 Modo Oscuro Activado")
+        
+        # --- NUEVAS INSTRUCCIONES CLARAS ---
+        st.divider()
+        st.subheader("📝 Instrucciones")
+        st.markdown("""
+        1. **Sube una foto** de la góndola (JPG/PNG).
+        2. Ve a la pestaña **'Análisis Visual'**.
+        3. Presiona el botón rojo **'PROCESAR IMAGEN'**.
+        4. Revisa los gráficos en **'Reporte Gerencial'**.
+        """)
 
     # Encabezado
     col_logo, col_text = st.columns([1, 5])
